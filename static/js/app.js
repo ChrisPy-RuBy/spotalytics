@@ -1,5 +1,5 @@
 /**
- * Spotify Data Tool - Custom JavaScript
+ * Spotalytics - Custom JavaScript
  * Global utilities and helper functions
  */
 
@@ -168,7 +168,7 @@ document.body.addEventListener('htmx:responseError', (event) => {
 
 // Log when page is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Spotify Data Tool loaded');
+    console.log('Spotalytics loaded');
 });
 
 // Export for use in modules

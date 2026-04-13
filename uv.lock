@@ -479,7 +479,7 @@ wheels = [
 ]
 
 [[package]]
-name = "spotify-data-tool"
+name = "spotalytics"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
