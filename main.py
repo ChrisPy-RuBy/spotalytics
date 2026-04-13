@@ -1,4 +1,4 @@
-"""Spotify Data Tool - FastAPI Web Application.
+"""Spotalytics - FastAPI Web Application.
 
 A web application for visualizing and exploring Spotify data with interactive
 charts and dashboards.
@@ -41,7 +41,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Spotify Data Tool",
+    title="Spotalytics",
     description="Visualize and explore your Spotify data",
     version="0.1.0",
     lifespan=lifespan,
@@ -228,7 +228,7 @@ async def analytics_page(request: Request):
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "healthy", "service": "spotify-data-tool"}
+    return {"status": "healthy", "service": "spotalytics"}
 
 
 if __name__ == "__main__":
