@@ -196,6 +196,21 @@ async def reset_data():
     return RedirectResponse(url="/upload", status_code=303)
 
 
+# Auth routes
+@app.get("/sign-in", response_class=HTMLResponse)
+async def sign_in_page(request: Request):
+    """Sign-in page — public, mounts the Clerk SignIn component."""
+    return templates.TemplateResponse("sign_in.html", {"request": request})
+
+
+@app.post("/api/sign-out")
+async def sign_out():
+    """Clear the Clerk session cookie and redirect to sign-in."""
+    response = RedirectResponse(url="/sign-in", status_code=303)
+    response.delete_cookie("__session")
+    return response
+
+
 # Page routes
 @app.get("/upload", response_class=HTMLResponse)
 async def upload_page(request: Request):

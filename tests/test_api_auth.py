@@ -48,15 +48,33 @@ class TestPublicRoutes:
         assert resp.status_code == 200
 
     def test_sign_in_page_is_public(self, client):
-        # /sign-in is not yet implemented (step 4 of auth plan) but must not require auth.
-        # A 404 is acceptable here; a 401 is not.
         resp = client.get("/sign-in")
-        assert resp.status_code != 401
+        assert resp.status_code == 200
 
     def test_static_files_are_public(self, client):
         # Static files are mounted at /static — a missing file returns 404, not 401
         resp = client.get("/static/nonexistent.txt")
         assert resp.status_code == 404
+
+
+class TestSignOut:
+    """Tests for POST /api/sign-out."""
+
+    def test_sign_out_redirects_to_sign_in(self, client):
+        resp = client.post("/api/sign-out")
+        assert resp.status_code == 303
+        assert resp.headers["location"] == "/sign-in"
+
+    def test_sign_out_clears_session_cookie(self, client):
+        resp = client.post("/api/sign-out")
+        # Starlette sets a cookie with empty value and max-age=0 to delete it
+        deleted = resp.cookies.get("__session")
+        assert deleted is None or deleted == ""
+
+    def test_sign_out_is_public(self, client):
+        """Sign-out should work even without a valid session cookie."""
+        resp = client.post("/api/sign-out")
+        assert resp.status_code == 303
 
 
 class TestAuthenticatedAccess:
