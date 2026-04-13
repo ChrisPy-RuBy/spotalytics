@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Sign In - Spotify Data Tool{% endblock %}
+
+{% block content %}
+<div class="flex justify-center mt-16">
+  <div id="clerk-sign-in"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.addEventListener('load', async function () {
+    await Clerk.load({ ui: { ClerkUI: window.__internal_ClerkUICtor } })
+    Clerk.mountSignIn(document.getElementById('clerk-sign-in'), {
+      afterSignInUrl: '/upload',
+    })
+  })
+</script>
+{% endblock %}

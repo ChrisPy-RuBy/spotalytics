@@ -63,7 +63,7 @@ def get_data_loader():
 
 
 # Middleware: redirect to /upload when no data is loaded
-UPLOAD_ALLOWED_PREFIXES = ("/upload", "/static", "/api/", "/health", "/sign-in")
+UPLOAD_ALLOWED_PREFIXES = ("/upload", "/static", "/api/", "/health", "/sign-in", "/sign-out")
 
 
 @app.middleware("http")
@@ -79,7 +79,9 @@ async def require_data(request: Request, call_next):
 # Exception handlers
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    """Handle HTTP exceptions."""
+    """Handle HTTP exceptions. Redirect browser requests to /sign-in on 401."""
+    if exc.status_code == 401 and not request.url.path.startswith("/api/"):
+        return RedirectResponse(url="/sign-in")
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": exc.detail, "status_code": exc.status_code},
@@ -203,43 +205,42 @@ async def sign_in_page(request: Request):
     return templates.TemplateResponse("sign_in.html", {"request": request})
 
 
-@app.post("/api/sign-out")
+@app.get("/api/sign-out")
 async def sign_out():
-    """Clear the Clerk session cookie and redirect to sign-in."""
-    response = RedirectResponse(url="/sign-in", status_code=303)
-    response.delete_cookie("__session")
-    return response
+    """Clear app data and redirect to sign-in. Called by Clerk after client-side sign-out."""
+    app_state.reset()
+    return RedirectResponse(url="/sign-in", status_code=303)
 
 
 # Page routes
 @app.get("/upload", response_class=HTMLResponse)
-async def upload_page(request: Request):
+async def upload_page(request: Request, user: dict = Depends(verify_session_cookie)):
     """Upload page — shown when no data is loaded."""
-    return templates.TemplateResponse("upload.html", {"request": request})
+    return templates.TemplateResponse("upload.html", {"request": request, "user": user})
 
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
+async def index(request: Request, user: dict = Depends(verify_session_cookie)):
     """Home page / dashboard."""
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {"request": request, "user": user})
 
 
 @app.get("/playlists", response_class=HTMLResponse)
-async def playlists_page(request: Request):
+async def playlists_page(request: Request, user: dict = Depends(verify_session_cookie)):
     """Playlists browsing page."""
-    return templates.TemplateResponse("playlists.html", {"request": request})
+    return templates.TemplateResponse("playlists.html", {"request": request, "user": user})
 
 
 @app.get("/tracks", response_class=HTMLResponse)
-async def tracks_page(request: Request):
+async def tracks_page(request: Request, user: dict = Depends(verify_session_cookie)):
     """Tracks browsing page."""
-    return templates.TemplateResponse("tracks.html", {"request": request})
+    return templates.TemplateResponse("tracks.html", {"request": request, "user": user})
 
 
 @app.get("/analytics", response_class=HTMLResponse)
-async def analytics_page(request: Request):
+async def analytics_page(request: Request, user: dict = Depends(verify_session_cookie)):
     """Analytics dashboard page."""
-    return templates.TemplateResponse("analytics.html", {"request": request})
+    return templates.TemplateResponse("analytics.html", {"request": request, "user": user})
 
 
 # Health check endpoint
