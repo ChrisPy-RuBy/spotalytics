@@ -13,7 +13,7 @@ from src.models import PlaylistsData, StreamingEvent, LibraryData
 @pytest.fixture
 def data_loader():
     """Create a DataLoader instance for testing."""
-    data_dir = Path("data")
+    data_dir = Path("tests/data")
     return DataLoader(data_dir)
 
 
@@ -22,15 +22,15 @@ class TestDataLoader:
 
     def test_initialization(self):
         """Test that DataLoader initializes correctly."""
-        data_dir = Path("data")
+        data_dir = Path("tests/data")
         loader = DataLoader(data_dir)
         assert loader.data_directory == data_dir
         assert loader.get_cache_keys() == []
 
     def test_initialization_with_string(self):
         """Test that DataLoader accepts string paths."""
-        loader = DataLoader("data")
-        assert loader.data_directory == Path("data")
+        loader = DataLoader("tests/data")
+        assert loader.data_directory == Path("tests/data")
 
     def test_initialization_invalid_directory(self):
         """Test that DataLoader raises error for invalid directory."""

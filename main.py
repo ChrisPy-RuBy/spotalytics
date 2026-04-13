@@ -11,13 +11,15 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+from src.auth import verify_session_cookie
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(name)s %(levelname)s %(message)s",
 )
 logger = logging.getLogger(__name__)
 
-from fastapi import FastAPI, HTTPException, Request, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -61,7 +63,7 @@ def get_data_loader():
 
 
 # Middleware: redirect to /upload when no data is loaded
-UPLOAD_ALLOWED_PREFIXES = ("/upload", "/static", "/api/", "/health")
+UPLOAD_ALLOWED_PREFIXES = ("/upload", "/static", "/api/", "/health", "/sign-in")
 
 
 @app.middleware("http")
@@ -111,14 +113,16 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
+_auth = [Depends(verify_session_cookie)]
+
 # Include API routers
-app.include_router(playlists.router, prefix="/api/playlists", tags=["playlists"])
-app.include_router(tracks.router, prefix="/api/tracks", tags=["tracks"])
-app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
+app.include_router(playlists.router, prefix="/api/playlists", tags=["playlists"], dependencies=_auth)
+app.include_router(tracks.router, prefix="/api/tracks", tags=["tracks"], dependencies=_auth)
+app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"], dependencies=_auth)
 
 
 # Upload endpoint
-@app.post("/api/upload")
+@app.post("/api/upload", dependencies=_auth)
 async def upload_spotify_data(file: UploadFile):
     """Accept a Spotify data export zip file, validate, extract, and load it."""
     # Read file contents and check size
@@ -184,7 +188,7 @@ async def upload_spotify_data(file: UploadFile):
 
 
 # Reset endpoint
-@app.post("/api/reset")
+@app.post("/api/reset", dependencies=_auth)
 async def reset_data():
     """Clear the current dataset and redirect to the upload page."""
     logger.info("Data reset requested")
@@ -236,7 +240,7 @@ if __name__ == "__main__":
     uvicorn.run(
             "main:app", 
             host="0.0.0.0",
-            port=8000,
+            port=8100,
             loop="uvloop",
             http="httptools",
             proxy_headers=True,
