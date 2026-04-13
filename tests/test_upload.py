@@ -102,9 +102,7 @@ class TestUploadEndpoint:
 
     def test_upload_nested_zip(self, client):
         """A zip with data files inside a subdirectory should work."""
-        zip_bytes = _make_zip(
-            {"my_spotify_data/Playlist1.json.json": MINIMAL_PLAYLIST}
-        )
+        zip_bytes = _make_zip({"my_spotify_data/Playlist1.json.json": MINIMAL_PLAYLIST})
 
         resp = client.post(
             "/api/upload",

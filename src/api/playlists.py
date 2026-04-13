@@ -97,7 +97,9 @@ async def get_playlist(
             break
 
     if not playlist:
-        raise HTTPException(status_code=404, detail=f"Playlist '{playlist_name}' not found")
+        raise HTTPException(
+            status_code=404, detail=f"Playlist '{playlist_name}' not found"
+        )
 
     items = playlist.get("items", [])
 
