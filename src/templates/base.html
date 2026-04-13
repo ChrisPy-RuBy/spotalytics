@@ -11,6 +11,24 @@
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 
+    <!-- Patch fetch before Alpine initializes so all API calls carry the Clerk token -->
+    <script>
+      ;(function () {
+        const _orig = window.fetch
+        window.fetch = async function (input, init) {
+          init = init || {}
+          const session = window.Clerk?.session
+          if (session) {
+            const token = await session.getToken()
+            if (token) {
+              init.headers = { 'Authorization': 'Bearer ' + token, ...(init.headers || {}) }
+            }
+          }
+          return _orig.call(this, input, init)
+        }
+      })()
+    </script>
+
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -140,6 +158,13 @@
         } else {
           signInBtn.innerHTML = '<button onclick="Clerk.openSignIn()" class="px-4 py-1.5 text-sm font-medium bg-spotify-green text-black rounded-full hover:opacity-90 transition-opacity">Sign In</button>'
         }
+
+        document.body.addEventListener('htmx:configRequest', async (event) => {
+          const token = await Clerk.session?.getToken()
+          if (token) {
+            event.detail.headers['Authorization'] = `Bearer ${token}`
+          }
+        })
       })
     </script>
 </body>
