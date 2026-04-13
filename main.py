@@ -11,19 +11,19 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(name)s %(levelname)s %(message)s",
-)
-logger = logging.getLogger(__name__)
+from src.api import analytics, playlists, tracks
+from src.app_state import AppState
 
 from fastapi import FastAPI, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from src.api import analytics, playlists, tracks
-from src.app_state import AppState
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(name)s %(levelname)s %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB
 
