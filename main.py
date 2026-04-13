@@ -11,19 +11,19 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(name)s %(levelname)s %(message)s",
-)
-logger = logging.getLogger(__name__)
+from src.api import analytics, playlists, tracks
+from src.app_state import AppState
 
 from fastapi import FastAPI, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from src.api import analytics, playlists, tracks
-from src.app_state import AppState
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(name)s %(levelname)s %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB
 
@@ -52,6 +52,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Configure Jinja2 templates
 templates = Jinja2Templates(directory="src/templates")
+
 
 def get_data_loader():
     """Get the DataLoader from app state, or raise if no data is loaded."""
@@ -234,11 +235,10 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-            "main:app", 
-            host="0.0.0.0",
-            port=8000,
-            loop="uvloop",
-            http="httptools",
-            proxy_headers=True,
-            )
-
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        loop="uvloop",
+        http="httptools",
+        proxy_headers=True,
+    )

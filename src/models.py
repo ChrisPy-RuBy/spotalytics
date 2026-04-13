@@ -7,15 +7,16 @@ Spotify data export formats.
 
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
-from datetime import datetime
 
 
 # ============================================================================
 # Playlist Models
 # ============================================================================
 
+
 class PlaylistTrack(BaseModel):
     """Track information from playlist data."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     track_name: str = Field(alias="trackName")
@@ -26,6 +27,7 @@ class PlaylistTrack(BaseModel):
 
 class PlaylistItem(BaseModel):
     """Item in a playlist (can be track, episode, audiobook, or local track)."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     track: Optional[PlaylistTrack] = None
@@ -37,6 +39,7 @@ class PlaylistItem(BaseModel):
 
 class Playlist(BaseModel):
     """A Spotify playlist with metadata and items."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     name: str
@@ -47,6 +50,7 @@ class Playlist(BaseModel):
 
 class PlaylistsData(BaseModel):
     """Root structure for Playlist1.json.json file."""
+
     playlists: List[Playlist]
 
 
@@ -54,8 +58,10 @@ class PlaylistsData(BaseModel):
 # Streaming History Models
 # ============================================================================
 
+
 class StreamingEvent(BaseModel):
     """A single streaming event from listening history."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     end_time: str = Field(alias="endTime")
@@ -78,8 +84,10 @@ class StreamingEvent(BaseModel):
 # Library Models
 # ============================================================================
 
+
 class LibraryTrack(BaseModel):
     """Track from user's saved library."""
+
     artist: str
     album: str
     track: str
@@ -88,6 +96,7 @@ class LibraryTrack(BaseModel):
 
 class LibraryData(BaseModel):
     """Root structure for YourLibrary.json.json file."""
+
     tracks: List[LibraryTrack]
 
 
@@ -95,8 +104,10 @@ class LibraryData(BaseModel):
 # API Response Models (for FastAPI endpoints)
 # ============================================================================
 
+
 class PlaylistSummary(BaseModel):
     """Summary information about a playlist for API responses."""
+
     name: str
     track_count: int
     last_modified: str
@@ -104,6 +115,7 @@ class PlaylistSummary(BaseModel):
 
 class TrackInfo(BaseModel):
     """Unified track information for API responses."""
+
     track_name: str
     artist_name: str
     album_name: Optional[str] = None
@@ -112,6 +124,7 @@ class TrackInfo(BaseModel):
 
 class TopTrackByPlaylist(BaseModel):
     """Track ranked by playlist appearance count."""
+
     track_uri: str
     track_name: str
     artist_name: str
@@ -120,6 +133,7 @@ class TopTrackByPlaylist(BaseModel):
 
 class TopTrackByPlays(BaseModel):
     """Track ranked by play count from streaming history."""
+
     track_name: str
     artist_name: str
     play_count: int
@@ -127,6 +141,7 @@ class TopTrackByPlays(BaseModel):
 
 class AnalyticsOverview(BaseModel):
     """High-level statistics for the dashboard."""
+
     total_playlists: int
     total_playlist_items: int
     total_streams: int
