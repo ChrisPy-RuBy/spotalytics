@@ -127,7 +127,9 @@ class TestAuthenticatedAccess:
 
     @pytest.fixture(autouse=True)
     def mock_auth(self):
-        app.dependency_overrides[verify_session_cookie] = lambda: {"sub": "test-user-id"}
+        app.dependency_overrides[verify_session_cookie] = lambda: {
+            "sub": "test-user-id"
+        }
         yield
         app.dependency_overrides.pop(verify_session_cookie, None)
 

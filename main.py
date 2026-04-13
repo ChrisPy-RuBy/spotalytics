@@ -64,7 +64,14 @@ def get_data_loader():
 
 
 # Middleware: redirect to /upload when no data is loaded
-UPLOAD_ALLOWED_PREFIXES = ("/upload", "/static", "/api/", "/health", "/sign-in", "/sign-out")
+UPLOAD_ALLOWED_PREFIXES = (
+    "/upload",
+    "/static",
+    "/api/",
+    "/health",
+    "/sign-in",
+    "/sign-out",
+)
 
 
 @app.middleware("http")
@@ -119,9 +126,15 @@ async def general_exception_handler(request: Request, exc: Exception):
 _auth = [Depends(verify_session_cookie)]
 
 # Include API routers
-app.include_router(playlists.router, prefix="/api/playlists", tags=["playlists"], dependencies=_auth)
-app.include_router(tracks.router, prefix="/api/tracks", tags=["tracks"], dependencies=_auth)
-app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"], dependencies=_auth)
+app.include_router(
+    playlists.router, prefix="/api/playlists", tags=["playlists"], dependencies=_auth
+)
+app.include_router(
+    tracks.router, prefix="/api/tracks", tags=["tracks"], dependencies=_auth
+)
+app.include_router(
+    analytics.router, prefix="/api/analytics", tags=["analytics"], dependencies=_auth
+)
 
 
 # Upload endpoint
@@ -229,7 +242,9 @@ async def index(request: Request, user: dict = Depends(verify_session_cookie)):
 @app.get("/playlists", response_class=HTMLResponse)
 async def playlists_page(request: Request, user: dict = Depends(verify_session_cookie)):
     """Playlists browsing page."""
-    return templates.TemplateResponse("playlists.html", {"request": request, "user": user})
+    return templates.TemplateResponse(
+        "playlists.html", {"request": request, "user": user}
+    )
 
 
 @app.get("/tracks", response_class=HTMLResponse)
@@ -241,7 +256,9 @@ async def tracks_page(request: Request, user: dict = Depends(verify_session_cook
 @app.get("/analytics", response_class=HTMLResponse)
 async def analytics_page(request: Request, user: dict = Depends(verify_session_cookie)):
     """Analytics dashboard page."""
-    return templates.TemplateResponse("analytics.html", {"request": request, "user": user})
+    return templates.TemplateResponse(
+        "analytics.html", {"request": request, "user": user}
+    )
 
 
 # Health check endpoint
@@ -255,11 +272,10 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-            "main:app", 
-            host="0.0.0.0",
-            port=8100,
-            loop="uvloop",
-            http="httptools",
-            proxy_headers=True,
-            )
-
+        "main:app",
+        host="0.0.0.0",
+        port=8100,
+        loop="uvloop",
+        http="httptools",
+        proxy_headers=True,
+    )

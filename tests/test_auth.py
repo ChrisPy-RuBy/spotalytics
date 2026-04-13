@@ -108,9 +108,7 @@ class TestVerifySessionCookie:
 
     def test_garbage_token_raises_401(self):
         request = _make_request({"__session": "not.a.jwt"})
-        with patch(
-            "src.auth._get_jwks", new=AsyncMock(return_value=TEST_JWKS)
-        ):
+        with patch("src.auth._get_jwks", new=AsyncMock(return_value=TEST_JWKS)):
             with pytest.raises(HTTPException) as exc:
                 self._run(verify_session_cookie(request))
         assert exc.value.status_code == 401
@@ -118,9 +116,7 @@ class TestVerifySessionCookie:
     def test_expired_token_raises_401(self):
         token = _make_token({"exp": int(time.time()) - 10})
         request = _make_request({"__session": token})
-        with patch(
-            "src.auth._get_jwks", new=AsyncMock(return_value=TEST_JWKS)
-        ):
+        with patch("src.auth._get_jwks", new=AsyncMock(return_value=TEST_JWKS)):
             with pytest.raises(HTTPException) as exc:
                 self._run(verify_session_cookie(request))
         assert exc.value.status_code == 401
@@ -128,9 +124,7 @@ class TestVerifySessionCookie:
     def test_wrong_issuer_raises_401(self):
         token = _make_token({"iss": "https://evil.example.com"})
         request = _make_request({"__session": token})
-        with patch(
-            "src.auth._get_jwks", new=AsyncMock(return_value=TEST_JWKS)
-        ):
+        with patch("src.auth._get_jwks", new=AsyncMock(return_value=TEST_JWKS)):
             with pytest.raises(HTTPException) as exc:
                 self._run(verify_session_cookie(request))
         assert exc.value.status_code == 401
@@ -138,9 +132,7 @@ class TestVerifySessionCookie:
     def test_valid_token_returns_claims(self):
         token = _make_token()
         request = _make_request({"__session": token})
-        with patch(
-            "src.auth._get_jwks", new=AsyncMock(return_value=TEST_JWKS)
-        ):
+        with patch("src.auth._get_jwks", new=AsyncMock(return_value=TEST_JWKS)):
             claims = self._run(verify_session_cookie(request))
         assert claims["sub"] == "user_test_123"
         assert claims["iss"] == CLERK_ISSUER
@@ -168,9 +160,7 @@ class TestVerifySessionCookie:
         request = _make_request({"__session": token})
         empty_jwks = {"keys": []}
 
-        with patch(
-            "src.auth._get_jwks", new=AsyncMock(return_value=empty_jwks)
-        ):
+        with patch("src.auth._get_jwks", new=AsyncMock(return_value=empty_jwks)):
             with pytest.raises(HTTPException) as exc:
                 self._run(verify_session_cookie(request))
         assert exc.value.status_code == 401
