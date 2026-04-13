@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-Spotify Data Tool — a FastAPI web application for exploring Spotify data exports. Users upload their Spotify data dump and browse playlists, tracks, and listening analytics in a web UI.
+Spotalytics — a FastAPI web application for exploring Spotify data exports. Users upload their Spotify data dump and browse playlists, tracks, and listening analytics in a web UI.
 
 ## Key Commands
 

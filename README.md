@@ -1,4 +1,4 @@
-# Spotify Data Tool
+# Spotalytics
 
 A FastAPI web application for exploring and analysing the data export that Spotify provides to its users. Upload your Spotify data dump and browse your playlists, tracks, and listening analytics through a web interface.
 

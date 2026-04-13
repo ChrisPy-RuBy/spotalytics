@@ -110,9 +110,7 @@ async def top_artists(
         List of artists with play count and total listening time
     """
     streaming_history = loader.load_streaming_history_raw()
-    return get_top_artists(
-        streaming_history, top_n=limit, min_ms_played=min_ms_played
-    )
+    return get_top_artists(streaming_history, top_n=limit, min_ms_played=min_ms_played)
 
 
 @router.get("/playlist-stats")

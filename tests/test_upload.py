@@ -103,9 +103,7 @@ class TestUploadEndpoint:
 
     def test_upload_nested_zip(self, client):
         """A zip with data files inside a subdirectory should work."""
-        zip_bytes = _make_zip(
-            {"my_spotify_data/Playlist1.json.json": MINIMAL_PLAYLIST}
-        )
+        zip_bytes = _make_zip({"my_spotify_data/Playlist1.json.json": MINIMAL_PLAYLIST})
 
         resp = client.post(
             "/api/upload",
@@ -157,7 +155,7 @@ class TestDataGating:
         """The upload page itself should always be accessible."""
         resp = client.get("/upload")
         assert resp.status_code == 200
-        assert "Upload Your Spotify Data" in resp.text
+        assert "Upload Your Data" in resp.text
 
     def test_health_accessible_without_data(self, client):
         """The health endpoint should not be gated."""

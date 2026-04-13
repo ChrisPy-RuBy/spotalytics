@@ -1,4 +1,4 @@
-"""Spotify Data Tool - FastAPI Web Application.
+"""Spotalytics - FastAPI Web Application.
 
 A web application for visualizing and exploring Spotify data with interactive
 charts and dashboards.
@@ -13,19 +13,19 @@ from pathlib import Path
 
 from src.auth import verify_session_cookie
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(name)s %(levelname)s %(message)s",
-)
-logger = logging.getLogger(__name__)
+from src.api import analytics, playlists, tracks
+from src.app_state import AppState
 
 from fastapi import Depends, FastAPI, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from src.api import analytics, playlists, tracks
-from src.app_state import AppState
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(name)s %(levelname)s %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB
 
@@ -43,7 +43,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Spotify Data Tool",
+    title="Spotalytics",
     description="Visualize and explore your Spotify data",
     version="0.1.0",
     lifespan=lifespan,
@@ -54,6 +54,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Configure Jinja2 templates
 templates = Jinja2Templates(directory="src/templates")
+
 
 def get_data_loader():
     """Get the DataLoader from app state, or raise if no data is loaded."""
@@ -247,7 +248,7 @@ async def analytics_page(request: Request, user: dict = Depends(verify_session_c
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "healthy", "service": "spotify-data-tool"}
+    return {"status": "healthy", "service": "spotalytics"}
 
 
 if __name__ == "__main__":
