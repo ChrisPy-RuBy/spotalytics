@@ -55,16 +55,16 @@ class DataLoader:
             FileNotFoundError: If the playlist file doesn't exist
             json.JSONDecodeError: If the file contains invalid JSON
         """
-        cache_key = 'playlists'
+        cache_key = "playlists"
 
         if cache_key not in self._cache:
-            playlist_file = self._data_dir / 'Playlist1.json.json'
+            playlist_file = self._data_dir / "Playlist1.json.json"
 
             if not playlist_file.exists():
                 raise FileNotFoundError(f"Playlist file not found: {playlist_file}")
 
             logger.info("Loading playlists from %s", playlist_file)
-            with open(playlist_file, 'r', encoding='utf-8') as f:
+            with open(playlist_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
             # Validate with Pydantic model
@@ -81,15 +81,15 @@ class DataLoader:
         Returns:
             Raw dictionary from JSON file
         """
-        cache_key = 'playlists_raw'
+        cache_key = "playlists_raw"
 
         if cache_key not in self._cache:
-            playlist_file = self._data_dir / 'Playlist1.json.json'
+            playlist_file = self._data_dir / "Playlist1.json.json"
 
             if not playlist_file.exists():
                 raise FileNotFoundError(f"Playlist file not found: {playlist_file}")
 
-            with open(playlist_file, 'r', encoding='utf-8') as f:
+            with open(playlist_file, "r", encoding="utf-8") as f:
                 self._cache[cache_key] = json.load(f)
 
         return self._cache[cache_key]
@@ -107,11 +107,13 @@ class DataLoader:
         Raises:
             FileNotFoundError: If no streaming history files are found
         """
-        cache_key = 'streaming_history'
+        cache_key = "streaming_history"
 
         if cache_key not in self._cache:
             # Find all streaming history files
-            streaming_files = sorted(self._data_dir.glob('StreamingHistory_music_*.json.json'))
+            streaming_files = sorted(
+                self._data_dir.glob("StreamingHistory_music_*.json.json")
+            )
 
             if not streaming_files:
                 raise FileNotFoundError(
@@ -123,10 +125,12 @@ class DataLoader:
             )
             all_events = []
             for file_path in streaming_files:
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     events_data = json.load(f)
                     # Validate each event with Pydantic
-                    all_events.extend([StreamingEvent(**event) for event in events_data])
+                    all_events.extend(
+                        [StreamingEvent(**event) for event in events_data]
+                    )
 
             self._cache[cache_key] = all_events
 
@@ -139,10 +143,12 @@ class DataLoader:
         Returns:
             List of raw event dictionaries
         """
-        cache_key = 'streaming_history_raw'
+        cache_key = "streaming_history_raw"
 
         if cache_key not in self._cache:
-            streaming_files = sorted(self._data_dir.glob('StreamingHistory_music_*.json.json'))
+            streaming_files = sorted(
+                self._data_dir.glob("StreamingHistory_music_*.json.json")
+            )
 
             if not streaming_files:
                 raise FileNotFoundError(
@@ -151,7 +157,7 @@ class DataLoader:
 
             all_events = []
             for file_path in streaming_files:
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     all_events.extend(json.load(f))
 
             self._cache[cache_key] = all_events
@@ -168,16 +174,16 @@ class DataLoader:
         Raises:
             FileNotFoundError: If the library file doesn't exist
         """
-        cache_key = 'library'
+        cache_key = "library"
 
         if cache_key not in self._cache:
-            library_file = self._data_dir / 'YourLibrary.json.json'
+            library_file = self._data_dir / "YourLibrary.json.json"
 
             if not library_file.exists():
                 raise FileNotFoundError(f"Library file not found: {library_file}")
 
             logger.info("Loading library from %s", library_file)
-            with open(library_file, 'r', encoding='utf-8') as f:
+            with open(library_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
             # Validate with Pydantic model
@@ -192,15 +198,15 @@ class DataLoader:
         Returns:
             Raw dictionary from JSON file
         """
-        cache_key = 'library_raw'
+        cache_key = "library_raw"
 
         if cache_key not in self._cache:
-            library_file = self._data_dir / 'YourLibrary.json.json'
+            library_file = self._data_dir / "YourLibrary.json.json"
 
             if not library_file.exists():
                 raise FileNotFoundError(f"Library file not found: {library_file}")
 
-            with open(library_file, 'r', encoding='utf-8') as f:
+            with open(library_file, "r", encoding="utf-8") as f:
                 self._cache[cache_key] = json.load(f)
 
         return self._cache[cache_key]

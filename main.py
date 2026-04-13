@@ -53,6 +53,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Configure Jinja2 templates
 templates = Jinja2Templates(directory="src/templates")
 
+
 def get_data_loader():
     """Get the DataLoader from app state, or raise if no data is loaded."""
     if not app_state.is_loaded:
@@ -234,11 +235,10 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-            "main:app", 
-            host="0.0.0.0",
-            port=8000,
-            loop="uvloop",
-            http="httptools",
-            proxy_headers=True,
-            )
-
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        loop="uvloop",
+        http="httptools",
+        proxy_headers=True,
+    )
