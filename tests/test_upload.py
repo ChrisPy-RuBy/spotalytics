@@ -153,7 +153,7 @@ class TestDataGating:
         """The upload page itself should always be accessible."""
         resp = client.get("/upload")
         assert resp.status_code == 200
-        assert "Upload Your Spotify Data" in resp.text
+        assert "Upload Your Data" in resp.text
 
     def test_health_accessible_without_data(self, client):
         """The health endpoint should not be gated."""
