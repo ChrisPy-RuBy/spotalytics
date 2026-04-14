@@ -50,3 +50,6 @@ jobs:
              --include='venv/**' \
              --exclude='*' \
              . spotify-data-tool@10.10.10.100:/opt/spotify-data-tool/
+      - name: Deployed
+        run: |
+          echo 🎉🎉🎉🎉
