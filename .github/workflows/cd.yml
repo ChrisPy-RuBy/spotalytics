@@ -39,13 +39,4 @@ jobs:
           sudo wg show
           nc -zv 10.10.10.100 22
           ssh-keyscan -v 10.10.10.100 >> ~/.ssh/known_host
-          rsync -zpr --delete \
-             --include='main.py' \
-             --include='src/' \
-             --include='src/**' \
-             --include='static/' \
-             --include='static/**' \
-             --include='venv/' \
-             --include='venv/**' \
-             --exclude='*' \
-             . spotify-data-tool@10.10.10.100:/opt/spotify-data-tool/
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no spotify-data-tool@10.10.10.100 echo ok
