@@ -9,6 +9,14 @@ jobs:
     steps:
       - name: Check Out
         uses: actions/checkout@v4.1.7
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install Dependencies
+        run: |
+          python -m venv venv
+          venv/bin/pip install -r requirements.txt
       - name: Connect to WireGuard
         run: |
           sudo apt-get install -y wireguard
@@ -31,4 +39,13 @@ jobs:
           echo "${{ secrets.ARTIFACT_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan 10.10.10.100 >> ~/.ssh/known_hosts
-          rsync -zp target/release/<svc> spotify-data-tool@10.10.10.100:/opt/spotify-data-tool/
+          rsync -zpr --delete \
+            --include='main.py' \
+            --include='src/' \
+            --include='src/**' \
+            --include='static/' \
+            --include='static/**' \
+            --include='venv/' \
+            --include='venv/**' \
+            --exclude='*' \
+            . spotify-data-tool@10.10.10.100:/opt/spotify-data-tool/
