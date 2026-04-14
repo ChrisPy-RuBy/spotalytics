@@ -33,17 +33,17 @@ jobs:
       - name: Upload to server
         run: |
           mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo "${{ secrets.ARTIFACT_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan 10.10.10.100 >> ~/.ssh/known_hosts
-          rsync -zpr --delete \
-            --include='main.py' \
-            --include='src/' \
-            --include='src/**' \
-            --include='static/' \
-            --include='static/**' \
-            --include='venv/' \
-            --include='venv/**' \
-            --exclude='*' \
-            . spotify-data-tool@10.10.10.100:/opt/spotify-data-tool/
+          # chmod 700 ~/.ssh
+          # echo "${{ secrets.ARTIFACT_SSH_KEY }}" > ~/.ssh/id_ed25519
+          # chmod 600 ~/.ssh/id_ed25519
+          # ssh-keyscan 10.10.10.100 >> ~/.ssh/known_hosts
+          # rsync -zpr --delete \
+          #   --include='main.py' \
+          #   --include='src/' \
+          #   --include='src/**' \
+          #   --include='static/' \
+          #   --include='static/**' \
+          #   --include='venv/' \
+          #   --include='venv/**' \
+          #   --exclude='*' \
+          #   . spotify-data-tool@10.10.10.100:/opt/spotify-data-tool/
