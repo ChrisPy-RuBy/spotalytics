@@ -37,7 +37,9 @@ jobs:
           echo "${{ secrets.ARTIFACT_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519    
           ssh-keyscan -v 10.10.10.100 >> ~/.ssh/known_host
-          rsync -e "ssh -v" -zpr --delete \
+          rsync -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
+          -zpr \
+             --delete \
              --include='main.py' \
              --include='src/' \
              --include='src/**' \
