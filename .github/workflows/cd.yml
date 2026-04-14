@@ -36,5 +36,4 @@ jobs:
           chmod 700 ~/.ssh
           echo "${{ secrets.ARTIFACT_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -v 10.10.10.100 >> ~/.ssh/known_hosts
-          
+          ssh-keyscan -v 10.10.10.100 
