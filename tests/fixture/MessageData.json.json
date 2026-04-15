@@ -1,0 +1,29 @@
+{
+  "spotify:chat:4KUex3GRWDbuKoEzj5KoH2": {
+    "members": [
+      "user_jazzfriend"
+    ],
+    "messages": [
+      {
+        "time": "2025-06-27T09:28:44.579Z",
+        "from": "user_jazzfriend",
+        "message": "spotify:album:6CmlLROLOUJZnZ8QeCCpqD"
+      },
+      {
+        "time": "2025-10-10T10:42:02.434Z",
+        "from": "user_jazzfriend",
+        "message": "spotify:playlist:5SbjBPMNZcnyUSRbfySeld"
+      },
+      {
+        "time": "2025-10-12T07:58:03.180Z",
+        "from": "user_swingpal",
+        "message": "spotify:playlist:0amQeDZTvzOgiZ3F6Tyjsb"
+      },
+      {
+        "time": "2025-10-12T08:17:30.618Z",
+        "from": "user_swingpal",
+        "message": "spotify:playlist:0amQeDZTvzOgiZ3F6Tyjsb?pt=350b44f721c9c5f23b4ce6f16dda8f42"
+      }
+    ]
+  }
+}
