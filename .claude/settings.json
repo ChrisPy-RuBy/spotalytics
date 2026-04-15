@@ -92,7 +92,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd /Users/chriswoodall/programs/spotify-data-tool && uv run ruff check && uv run ruff format --check && uv run pytest -x -q 2>&1 | tail -20"
+            "command": "uv run ruff check && uv run ruff format --check && uv run pytest -x -q 2>&1 | tail -20"
           }
         ]
       }
