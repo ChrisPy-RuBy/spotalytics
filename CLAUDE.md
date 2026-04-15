@@ -14,12 +14,22 @@ python main.py          # Run dev server (localhost:8000)
 uv run pytest           # Run test suite
 ```
 
-Pre-commit hooks run Ruff for linting and formatting on staged files.
+Pre-commit hooks (via `uv-pre-commit`) run Ruff for linting/formatting and auto-generate `requirements.txt` via `uv export` whenever `pyproject.toml` or `uv.lock` change.
 
 ## Dependencies
 
 Runtime: FastAPI, Uvicorn, Jinja2, python-multipart
-Dev: pytest, pre-commit, httpx
+Dev: pytest, pre-commit, httpx, ruff
+
+## CI/CD
+
+- CI: GitHub Actions lint and test jobs
+- CD: `.github/workflows/cd.yml` — connects via WireGuard, deploys via rsync to `/opt/spotalytics/` on the server
+- Deployment artifacts: `main.py`, `src/`, `static/`, `venv/`
+
+## Claude Code
+
+A Stop hook in `.claude/settings.json` runs `ruff check`, `ruff format --check`, and `pytest -x` before each response.
 
 ## Code Structure
 
