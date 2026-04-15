@@ -6,6 +6,7 @@
       "Edit(./**)",
       "Bash(ls:*)",
       "Bash(cat:*)",
+      "Bash(jq:*)",
       "Bash(rg:*)",
       "Bash(fd:*)",
       "Bash(find:*)",
