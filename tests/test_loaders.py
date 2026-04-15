@@ -4,33 +4,42 @@ Unit tests for data loading functionality.
 Tests the DataLoader class with real Spotify data files.
 """
 
+import tarfile
 import pytest
 from pathlib import Path
 from src.loaders import DataLoader
 from src.models import PlaylistsData, StreamingEvent, LibraryData
 
+FIXTURE_ARCHIVE = Path("tests/fixture.tar.gz")
+
 
 @pytest.fixture
-def data_loader():
+def fixture_dir(tmp_path):
+    """Extract fixture archive into a temp directory."""
+    with tarfile.open(FIXTURE_ARCHIVE, "r:gz") as tar:
+        tar.extractall(tmp_path, filter="data")
+    return tmp_path
+
+
+@pytest.fixture
+def data_loader(fixture_dir):
     """Create a DataLoader instance for testing."""
-    data_dir = Path("tests/fixture")
-    return DataLoader(data_dir)
+    return DataLoader(fixture_dir)
 
 
 class TestDataLoader:
     """Test suite for DataLoader class."""
 
-    def test_initialization(self):
+    def test_initialization(self, fixture_dir):
         """Test that DataLoader initializes correctly."""
-        data_dir = Path("tests/fixture")
-        loader = DataLoader(data_dir)
-        assert loader.data_directory == data_dir
+        loader = DataLoader(fixture_dir)
+        assert loader.data_directory == fixture_dir
         assert loader.get_cache_keys() == []
 
-    def test_initialization_with_string(self):
+    def test_initialization_with_string(self, fixture_dir):
         """Test that DataLoader accepts string paths."""
-        loader = DataLoader("tests/fixture")
-        assert loader.data_directory == Path("tests/fixture")
+        loader = DataLoader(str(fixture_dir))
+        assert loader.data_directory == fixture_dir
 
     def test_initialization_invalid_directory(self):
         """Test that DataLoader raises error for invalid directory."""
@@ -46,8 +55,8 @@ class TestDataLoader:
 
         # Check structure
         assert len(playlists_data.playlists) > 0
-        assert hasattr(playlists_data.playlists[0], 'name')
-        assert hasattr(playlists_data.playlists[0], 'items')
+        assert hasattr(playlists_data.playlists[0], "name")
+        assert hasattr(playlists_data.playlists[0], "items")
 
     def test_load_playlists_raw(self, data_loader):
         """Test loading playlists as raw dict."""
@@ -55,8 +64,8 @@ class TestDataLoader:
 
         # Check type
         assert isinstance(playlists_raw, dict)
-        assert 'playlists' in playlists_raw
-        assert isinstance(playlists_raw['playlists'], list)
+        assert "playlists" in playlists_raw
+        assert isinstance(playlists_raw["playlists"], list)
 
     def test_load_streaming_history(self, data_loader):
         """Test loading streaming history with Pydantic validation."""
@@ -69,9 +78,9 @@ class TestDataLoader:
 
         # Check properties
         first_event = streaming_history[0]
-        assert hasattr(first_event, 'track_name')
-        assert hasattr(first_event, 'artist_name')
-        assert hasattr(first_event, 'ms_played')
+        assert hasattr(first_event, "track_name")
+        assert hasattr(first_event, "artist_name")
+        assert hasattr(first_event, "ms_played")
 
         # Test helper properties
         assert first_event.seconds_played == first_event.ms_played / 1000.0
@@ -96,10 +105,10 @@ class TestDataLoader:
 
         # Check structure
         first_track = library_data.tracks[0]
-        assert hasattr(first_track, 'artist')
-        assert hasattr(first_track, 'album')
-        assert hasattr(first_track, 'track')
-        assert hasattr(first_track, 'uri')
+        assert hasattr(first_track, "artist")
+        assert hasattr(first_track, "album")
+        assert hasattr(first_track, "track")
+        assert hasattr(first_track, "uri")
 
     def test_load_library_raw(self, data_loader):
         """Test loading library as raw dict."""
@@ -107,14 +116,14 @@ class TestDataLoader:
 
         # Check type
         assert isinstance(library_raw, dict)
-        assert 'tracks' in library_raw
-        assert isinstance(library_raw['tracks'], list)
+        assert "tracks" in library_raw
+        assert isinstance(library_raw["tracks"], list)
 
     def test_caching_behavior(self, data_loader):
         """Test that data is cached after first load."""
         # Load playlists (should cache)
         data_loader.load_playlists()
-        assert 'playlists' in data_loader.get_cache_keys()
+        assert "playlists" in data_loader.get_cache_keys()
 
         # Load again (should use cache)
         playlists_data = data_loader.load_playlists()
@@ -122,7 +131,7 @@ class TestDataLoader:
 
         # Verify cache keys
         cache_keys = data_loader.get_cache_keys()
-        assert 'playlists' in cache_keys
+        assert "playlists" in cache_keys
 
     def test_clear_cache_specific_key(self, data_loader):
         """Test clearing specific cache key."""
@@ -133,9 +142,9 @@ class TestDataLoader:
         assert len(data_loader.get_cache_keys()) >= 2
 
         # Clear specific key
-        data_loader.clear_cache('playlists')
-        assert 'playlists' not in data_loader.get_cache_keys()
-        assert 'streaming_history' in data_loader.get_cache_keys()
+        data_loader.clear_cache("playlists")
+        assert "playlists" not in data_loader.get_cache_keys()
+        assert "streaming_history" in data_loader.get_cache_keys()
 
     def test_clear_cache_all(self, data_loader):
         """Test clearing all cached data."""
@@ -160,11 +169,11 @@ class TestDataLoader:
             for item in playlist.items:
                 if item.track:
                     track = item.track
-                    assert hasattr(track, 'track_name')
-                    assert hasattr(track, 'artist_name')
-                    assert hasattr(track, 'album_name')
-                    assert hasattr(track, 'track_uri')
-                    assert track.track_uri.startswith('spotify:track:')
+                    assert hasattr(track, "track_name")
+                    assert hasattr(track, "artist_name")
+                    assert hasattr(track, "album_name")
+                    assert hasattr(track, "track_uri")
+                    assert track.track_uri.startswith("spotify:track:")
                     track_found = True
                     break
             if track_found:
