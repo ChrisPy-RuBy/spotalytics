@@ -44,6 +44,7 @@ def client():
     return TestClient(app, follow_redirects=False)
 
 
+@pytest.mark.usefixtures("mock_auth")
 class TestUploadEndpoint:
     """Tests for POST /api/upload."""
 
@@ -132,11 +133,12 @@ class TestUploadEndpoint:
         assert not first_dir.exists()
 
 
+@pytest.mark.usefixtures("mock_auth")
 class TestDataGating:
     """Tests that routes require uploaded data."""
 
     def test_api_returns_403_without_upload(self, client):
-        """API endpoints should return 403 when no data is loaded."""
+        """Authenticated requests should return 403 when no data is loaded."""
         resp = client.get("/api/playlists/")
 
         assert resp.status_code == 403
@@ -172,6 +174,7 @@ class TestDataGating:
         assert "Dashboard" in resp.text
 
 
+@pytest.mark.usefixtures("mock_auth")
 class TestResetEndpoint:
     """Tests for POST /api/reset."""
 
@@ -225,6 +228,7 @@ class TestResetEndpoint:
         assert "Reset Data" not in resp.text
 
 
+@pytest.mark.usefixtures("mock_auth")
 class TestLifespanCleanup:
     """Tests that server shutdown cleans up temporary data."""
 

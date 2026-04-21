@@ -11,10 +11,12 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+from src.auth import verify_session_cookie
+
 from src.api import analytics, playlists, tracks
 from src.app_state import AppState
 
-from fastapi import FastAPI, HTTPException, Request, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -62,7 +64,14 @@ def get_data_loader():
 
 
 # Middleware: redirect to /upload when no data is loaded
-UPLOAD_ALLOWED_PREFIXES = ("/upload", "/static", "/api/", "/health")
+UPLOAD_ALLOWED_PREFIXES = (
+    "/upload",
+    "/static",
+    "/api/",
+    "/health",
+    "/sign-in",
+    "/sign-out",
+)
 
 
 @app.middleware("http")
@@ -78,7 +87,9 @@ async def require_data(request: Request, call_next):
 # Exception handlers
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    """Handle HTTP exceptions."""
+    """Handle HTTP exceptions. Redirect browser requests to /sign-in on 401."""
+    if exc.status_code == 401 and not request.url.path.startswith("/api/"):
+        return RedirectResponse(url="/sign-in")
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": exc.detail, "status_code": exc.status_code},
@@ -112,14 +123,22 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
+_auth = [Depends(verify_session_cookie)]
+
 # Include API routers
-app.include_router(playlists.router, prefix="/api/playlists", tags=["playlists"])
-app.include_router(tracks.router, prefix="/api/tracks", tags=["tracks"])
-app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
+app.include_router(
+    playlists.router, prefix="/api/playlists", tags=["playlists"], dependencies=_auth
+)
+app.include_router(
+    tracks.router, prefix="/api/tracks", tags=["tracks"], dependencies=_auth
+)
+app.include_router(
+    analytics.router, prefix="/api/analytics", tags=["analytics"], dependencies=_auth
+)
 
 
 # Upload endpoint
-@app.post("/api/upload")
+@app.post("/api/upload", dependencies=_auth)
 async def upload_spotify_data(file: UploadFile):
     """Accept a Spotify data export zip file, validate, extract, and load it."""
     # Read file contents and check size
@@ -185,7 +204,7 @@ async def upload_spotify_data(file: UploadFile):
 
 
 # Reset endpoint
-@app.post("/api/reset")
+@app.post("/api/reset", dependencies=_auth)
 async def reset_data():
     """Clear the current dataset and redirect to the upload page."""
     logger.info("Data reset requested")
@@ -193,35 +212,53 @@ async def reset_data():
     return RedirectResponse(url="/upload", status_code=303)
 
 
+# Auth routes
+@app.get("/sign-in", response_class=HTMLResponse)
+async def sign_in_page(request: Request):
+    """Sign-in page — public, mounts the Clerk SignIn component."""
+    return templates.TemplateResponse("sign_in.html", {"request": request})
+
+
+@app.get("/api/sign-out")
+async def sign_out():
+    """Clear app data and redirect to sign-in. Called by Clerk after client-side sign-out."""
+    app_state.reset()
+    return RedirectResponse(url="/sign-in", status_code=303)
+
+
 # Page routes
 @app.get("/upload", response_class=HTMLResponse)
-async def upload_page(request: Request):
+async def upload_page(request: Request, user: dict = Depends(verify_session_cookie)):
     """Upload page — shown when no data is loaded."""
-    return templates.TemplateResponse("upload.html", {"request": request})
+    return templates.TemplateResponse("upload.html", {"request": request, "user": user})
 
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
+async def index(request: Request, user: dict = Depends(verify_session_cookie)):
     """Home page / dashboard."""
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {"request": request, "user": user})
 
 
 @app.get("/playlists", response_class=HTMLResponse)
-async def playlists_page(request: Request):
+async def playlists_page(request: Request, user: dict = Depends(verify_session_cookie)):
     """Playlists browsing page."""
-    return templates.TemplateResponse("playlists.html", {"request": request})
+    return templates.TemplateResponse(
+        "playlists.html", {"request": request, "user": user}
+    )
 
 
 @app.get("/tracks", response_class=HTMLResponse)
-async def tracks_page(request: Request):
+async def tracks_page(request: Request, user: dict = Depends(verify_session_cookie)):
     """Tracks browsing page."""
-    return templates.TemplateResponse("tracks.html", {"request": request})
+    return templates.TemplateResponse("tracks.html", {"request": request, "user": user})
 
 
 @app.get("/analytics", response_class=HTMLResponse)
-async def analytics_page(request: Request):
+async def analytics_page(request: Request, user: dict = Depends(verify_session_cookie)):
     """Analytics dashboard page."""
-    return templates.TemplateResponse("analytics.html", {"request": request})
+    return templates.TemplateResponse(
+        "analytics.html", {"request": request, "user": user}
+    )
 
 
 # Health check endpoint
@@ -237,7 +274,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
+        port=8100,
         loop="uvloop",
         http="httptools",
         proxy_headers=True,
